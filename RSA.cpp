@@ -16,7 +16,7 @@ number RSA::generatePrime(int min, int max){
     } while(!isPrime(num));
 
     return num;
-    
+
 }
 
 
@@ -91,8 +91,8 @@ std::vector<number> RSA::encrypt(const std::string& message){
     std::vector<number> encrypted;
 
     for(char M : message){
-        number ind = alp.find(M);
-        encrypted.push_back(modExp(M, e, n)); // M^e mod n
+        number m = alp.find(M);
+        encrypted.push_back(modExp(m, e, n)); // m^e mod n
     }
 
     return encrypted;
