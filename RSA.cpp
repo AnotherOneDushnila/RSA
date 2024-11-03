@@ -3,12 +3,21 @@
 
 
 
-
 RSA::RSA() : gen(rd()){};
 
 
 
-number RSA::generatePrime(int min, int max){}
+number RSA::generatePrime(int min, int max){
+    std::uniform_int_distribution<long long> dist(min, max);
+    number num;
+
+    do{
+        num = dist(gen);
+    } while(!isPrime(num));
+
+    return num;
+    
+}
 
 
 
@@ -28,12 +37,9 @@ bool RSA::isPrime(number num){
 
 number RSA::gcd(number a, number b){
 
-    if(b == 0) 
-        return a;
-
-    while(b){
+    while(b > 0){
         a %= b;
-        std::swap(a, b);
+        std::swap(a, b); 
     }
 
     return a;
@@ -41,23 +47,64 @@ number RSA::gcd(number a, number b){
 
 
 
-void RSA::generateKeys(){}
+void RSA::generateKeys(){
+    std::uniform_int_distribution<> dist(0,5);
+
+    number p = generatePrime(500, 1000);
+    number q = generatePrime(1000, 2000);
+    number phi = (p-1)*(q-1);
+
+    n = p * q;
+
+
+    const std::vector<long long> common_e = {65537, 257, 17};
+
+    e = common_e[dist(gen)];
+
+    d = modInverse(e, phi);
+}
 
 
 
-number RSA::modInverse(number a, number b){};
+number RSA::modInverse(number a, number b){} // there will be something like extended Euclidean algorithm
 
 
 
-number RSA::modExp(number base, number exp, number mod){};
+number RSA::modExp(number base, number exp, number mod){
+    number result = 1;
+
+    while (exp > 0) {
+        if (exp % 2 == 1){                         
+            result = (result * base) % mod;
+            n--;                                
+        }                                            
+        base = (base * base) % mod;
+        exp /= 2;
+    }
+    return result;
+
+}
 
 
 
-std::vector<number> RSA::encrypt(const std::string& message){}
+std::vector<number> RSA::encrypt(const std::string& message){
+    std::vector<number> encrypted;
+
+    for(char M : message){
+        number ind = alp.find(M);
+        encrypted.push_back(modExp(M, e, n)); // M^e mod n
+    }
+
+    return encrypted;
+
+}
 
 
 
-std::string RSA::decrypt(const std::vector<number>& encrypted){}
+std::string RSA::decrypt(const std::vector<number>& encrypted){
+    std::string decrypted;
+
+}
 
 
 

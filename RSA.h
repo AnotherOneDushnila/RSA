@@ -8,7 +8,11 @@
 #include <fstream>
 
 
+
+
 typedef unsigned long long number;
+
+std::string alp = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm .,:;''!?@#$%^&*()[]{}-+=1234567890";
 
 
 
