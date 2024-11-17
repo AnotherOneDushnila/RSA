@@ -28,6 +28,7 @@ class RSA {
 
     public:
         RSA();
+        ~RSA(){};
         void generateKeys();
         bool isPrime(number num);
         number gcd(number a, number b);

@@ -8,7 +8,7 @@ RSA::RSA() : gen(rd()){};
 
 
 number RSA::generatePrime(int min, int max){
-    std::uniform_int_distribution<long long> dist(min, max);
+    std::uniform_int_distribution<number> dist(min, max);
     number num;
 
     do{
@@ -48,20 +48,27 @@ number RSA::gcd(number a, number b){
 
 
 void RSA::generateKeys(){
-    std::uniform_int_distribution<> dist(0,2);
+    do{
+    number p = generatePrime(2, 10000);
+    number q = generatePrime(32, 20000);
+    number phi = (p-1)*(q-1); 
 
-    number p = generatePrime(10, 100);
-    number q = generatePrime(50, 200);
-    number phi = (p-1)*(q-1);
+    n = p * q; 
 
-    n = p * q;
+    number i = 2;
 
+    while(gcd(i, phi) != 1){
+        if(i >= phi){
+            break;
+        }
+        i++;
+    }
 
-    const std::vector<int> common_e = {65537, 257, 17};
-
-    e = common_e[dist(gen)];
+    e = i;
 
     d = modInverse(e, phi);
+    
+    } while(d > 10000000000000000); // to avoid 20-25 nums
 }
 
 
@@ -93,7 +100,7 @@ number RSA::modInverse(number a, number b){     // Function, based on extended E
     }
     
 
-    return x0; // We need a Bezout coeff (d), so we return it
+    return x0;
 }
 
 
@@ -134,9 +141,7 @@ std::string RSA::decrypt(const std::vector<number>& encrypted){
     number res;
 
     for(number m : encrypted){
-        do{
-            res = modExp(m, d, n);  // m^d mod n
-        } while(res > alp.size());  // not umom
+        res = modExp(m, d, n);  // m^d mod n
         decrypted += alp[res];
     }
     return decrypted;
