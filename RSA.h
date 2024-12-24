@@ -10,7 +10,7 @@
 
 
 
-typedef unsigned long long number;
+typedef unsigned long long num;
 
 std::string alp = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm .,:;''!?@#$%^&*()[]{}-+=1234567890";
 
@@ -20,22 +20,22 @@ class RSA {
 
 
     private:
-        number n, e, d;
-        std::random_device rd;
-        std::mt19937 gen;
-        number generatePrime(int min, int max);
+
+        num n, e, d;
+        void generateKeys(num p, num q);
+    
 
 
     public:
-        RSA();
+
+        RSA(num p, num q);
         ~RSA(){};
-        void generateKeys();
-        bool isPrime(number num);
-        number gcd(number a, number b);
-        number modInverse(number a, number b);
-        number modExp(number base, number exp, number mod);
-        std::vector<number> encrypt(const std::string& message);
-        std::string decrypt(const std::vector<number>& encrypted);
+        bool isPrime(num num);
+        num gcd(num a, num b);
+        num modInverse(num a, num b);
+        num modExp(num base, num exp, num mod);   
+        std::vector<num> encrypt(const std::string& message);
+        std::string decrypt(const std::vector<num>& encrypted);
         void getPublicKey();
         void getPrivateKey();
 

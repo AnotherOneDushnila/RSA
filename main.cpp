@@ -4,17 +4,14 @@
 
 
 int main() {
-    RSA rsa;
-    
-    // Generate the public and private keys
-    rsa.generateKeys();
+    RSA rsa(17, 151); // (277, 71)
     
     // Original message
     std::string message = "RSA";
     std::cout << "Original message: " << message << std::endl;
     
     // Encrypt the message
-    std::vector<number> encrypted = rsa.encrypt(message);
+    std::vector<num> encrypted = rsa.encrypt(message);
     rsa.getPublicKey();
     rsa.getPrivateKey();
     std::cout << "Encrypted message: ";

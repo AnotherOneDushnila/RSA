@@ -3,30 +3,20 @@
 
 
 
-RSA::RSA() : gen(rd()){};
+// RSA::RSA() : gen(rd()){};
 
-
-
-number RSA::generatePrime(int min, int max){
-    std::uniform_int_distribution<number> dist(min, max);
-    number num;
-
-    do{
-        num = dist(gen);
-    } while(!isPrime(num));
-
-    return num;
-
+RSA::RSA(num p, num q){
+    generateKeys(p, q);
 }
 
 
 
-bool RSA::isPrime(number num){
+bool RSA::isPrime(num number){
 
-    if (num < 2) 
+    if (number < 2) 
         return false;
-    for (number i = 2; i <= sqrt(num); i++) {
-        if (num % i == 0) 
+    for (num i = 2; i <= sqrt(number); i++) {
+        if (number % i == 0) 
             return false;
     }
     return true;
@@ -35,7 +25,7 @@ bool RSA::isPrime(number num){
 
 
 
-number RSA::gcd(number a, number b){
+num RSA::gcd(num a, num b){
 
     while(b > 0){
         a %= b;
@@ -47,38 +37,40 @@ number RSA::gcd(number a, number b){
 
 
 
-void RSA::generateKeys(){
-    do{
-    number p = generatePrime(2, 10000);
-    number q = generatePrime(32, 20000);
-    number phi = (p-1)*(q-1); 
+void RSA::generateKeys(num p, num q){
+    std::vector<num> res;
+    num phi = (p-1)*(q-1); 
 
     n = p * q; 
-
-    number i = 2;
-
-    while(gcd(i, phi) != 1){
-        if(i >= phi){
-            break;
-        }
-        i++;
+    if (n < 88) {
+        throw std::invalid_argument("n is too small, try to reset p and q");
     }
 
-    e = i;
+    e = 2;
+
+    while(e < phi){
+        if(gcd(e, phi) == 1){
+            break;
+        }
+        else{
+            e++;
+        }
+    } 
+
+    
 
     d = modInverse(e, phi);
     
-    } while(d > 10000000000000000); // to avoid 20-25 nums
 }
 
 
 
-number RSA::modInverse(number a, number b){     // Function, based on extended Euclidean algorithm. Returns one of Bezout coeffs.
-    number r0 = a;
-    number r = b;
-    number q, r1, y1, x1;
-    number x0 = 1, x = 0;
-    number y0 = 0, y = 1;
+num RSA::modInverse(num a, num b){     // Function, based on extended Euclidean algorithm. Returns one of Bezout coeffs.
+    num r0 = a;
+    num r = b;
+    num q, r1, y1, x1;
+    num x0 = 1, x = 0;
+    num y0 = 0, y = 1;
     // a*x0 + b*y0 = 1
     
     while(r != 0){
@@ -105,8 +97,8 @@ number RSA::modInverse(number a, number b){     // Function, based on extended E
 
 
 
-number RSA::modExp(number base, number exp, number mod){
-    number result = 1;
+num RSA::modExp(num base, num exp, num mod){
+    num result = 1;
 
     while (exp > 0) {
         if (exp % 2 == 1){                         
@@ -122,11 +114,11 @@ number RSA::modExp(number base, number exp, number mod){
 
 
 
-std::vector<number> RSA::encrypt(const std::string& message){
-    std::vector<number> encrypted;
+std::vector<num> RSA::encrypt(const std::string& message){
+    std::vector<num> encrypted;
 
     for(char M : message){
-        number m = alp.find(M);
+        num m = alp.find(M);
         encrypted.push_back(modExp(m, e, n)); // m^e mod n
     }
 
@@ -136,17 +128,24 @@ std::vector<number> RSA::encrypt(const std::string& message){
 
 
 
-std::string RSA::decrypt(const std::vector<number>& encrypted){
+std::string RSA::decrypt(const std::vector<num>& encrypted){
     std::string decrypted;
-    number res;
+    num res;
 
-    for(number m : encrypted){
-        res = modExp(m, d, n);  // m^d mod n
+    for(num m : encrypted){
+        
+        res = modExp(m, d, n);
+
         decrypted += alp[res];
     }
     return decrypted;
 }
 
+
+
+// std::vector<number> RSA::attack(const std::vector<number> pubKey){
+
+// }
 
 
 void RSA::getPublicKey(){
