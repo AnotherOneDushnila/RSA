@@ -3,9 +3,14 @@
 
 
 
-// RSA::RSA() : gen(rd()){};
+
 
 RSA::RSA(num p, num q){
+    
+    if(!isPrime(p) || !isPrime(q)){
+        throw std::invalid_argument("Numbers p and q must be prime!");
+    }
+
     generateKeys(p, q);
 }
 
@@ -13,8 +18,9 @@ RSA::RSA(num p, num q){
 
 bool RSA::isPrime(num number){
 
-    if (number < 2) 
+    if (number < 2){ 
         return false;
+    }
     for (num i = 2; i <= sqrt(number); i++) {
         if (number % i == 0) 
             return false;
@@ -38,7 +44,9 @@ num RSA::gcd(num a, num b){
 
 
 void RSA::generateKeys(num p, num q){
-    std::vector<num> res;
+    bool ContinueSearch = true;
+    std::vector<unsigned int> FermatNumbers = {17, 257, 65537};
+
     num phi = (p-1)*(q-1); 
 
     n = p * q; 
@@ -47,33 +55,41 @@ void RSA::generateKeys(num p, num q){
     }
 
     e = 2;
-
-    while(e < phi){
-        if(gcd(e, phi) == 1){
-            break;
+    for(int f : FermatNumbers) {
+        if (gcd(f, phi) == 1 && f < phi) {
+            e = f;
+            ContinueSearch = false;
         }
-        else{
-            e++;
-        }
-    } 
+    }
 
+    if(ContinueSearch){
+        while(e < phi){
+            if(gcd(e, phi) == 1){
+                break;
+            }
+            else{
+                e++;
+            }
+        } 
+    }
     
 
+    
     d = modInverse(e, phi);
     
 }
 
 
 
-num RSA::modInverse(num a, num b){     // Function, based on extended Euclidean algorithm. Returns one of Bezout coeffs.
-    num r0 = a;
-    num r = b;
-    num q, r1, y1, x1;
-    num x0 = 1, x = 0;
-    num y0 = 0, y = 1;
-    // a*x0 + b*y0 = 1
-    
-    while(r != 0){
+num RSA::modInverse(num a, num b){// Function, based on extended Euclidean algorithm. Returns one of Bezout coeffs.
+    long long r0 = a;
+    long long r = b;
+    long long q, r1, y1, x1;
+    long long x0 = 1, x = 0;
+    long long y0 = 0, y = 1;
+    // a*x0 + b*y0 = 1  
+
+    while(r != 0) {
 
         q = r0/r;
 
@@ -90,10 +106,15 @@ num RSA::modInverse(num a, num b){     // Function, based on extended Euclidean 
         // y0 = y1;
         
     }
-    
 
+    while(x0 < 0){
+        x0 += b; //b = phi | ax = 1 mod b => ax + akb = 1 mod b
+    }
+    
     return x0;
+
 }
+
 
 
 
@@ -139,13 +160,10 @@ std::string RSA::decrypt(const std::vector<num>& encrypted){
         decrypted += alp[res];
     }
     return decrypted;
+
 }
 
 
-
-// std::vector<number> RSA::attack(const std::vector<number> pubKey){
-
-// }
 
 
 void RSA::getPublicKey(){
@@ -165,6 +183,49 @@ void RSA::getPrivateKey(){
     std::ofstream file("PrivateKey.txt");
 
     file << d << std::endl << n;
+
+    file.close();
+
+}
+
+
+
+std::string RSA::getMessage(std::string& path){
+    std::string line;
+    std::string res;
+    std::ifstream in(path);
+
+    if(in.is_open()){
+        while (std::getline(in, line)){
+            res += line;
+        }
+    }
+    
+    in.close();
+
+    return res;
+}
+
+
+
+void RSA::getCipher(std::vector<num>& encrypted){
+    std::ofstream file("ciphertext.txt");
+
+    for(num chpr : encrypted){
+        file << chpr << " ";
+    }
+
+    file.close();
+}
+
+
+
+void RSA::getDecryptedMessage(std::string& decrypted){
+    std::ofstream file("decrypted_m.txt");
+
+    for(char ch : decrypted){
+        file << ch;
+    }
 
     file.close();
 

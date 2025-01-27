@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <filesystem>
 
 
 
@@ -36,6 +37,9 @@ class RSA {
         num modExp(num base, num exp, num mod);   
         std::vector<num> encrypt(const std::string& message);
         std::string decrypt(const std::vector<num>& encrypted);
+        void getCipher(std::vector<num>& encrypted);
+        void getDecryptedMessage(std::string& decrypted);
+        std::string getMessage(std::string& path);
         void getPublicKey();
         void getPrivateKey();
 
